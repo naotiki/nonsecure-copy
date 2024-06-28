@@ -1,18 +1,24 @@
-TARGET = ./build/NonSecureCopy
+COMPILER  = gcc
+LINKS     =
+CFLAGS    = -g -Wall -O2
 
 BUILD_DIR = ./build
-OBJ_DIR = $(BUILD_DIR)/obj
+OBJ_DIR   = $(BUILD_DIR)/obj
+SRC_DIR   = ./src
 
-SOURCES  = $(wildcard *.c)
-OBJECTS  = $(addprefix $(OBJ_DIR)/, $(SOURCES:.c=.o))
+TARGET    = $(BUILD_DIR)/ncp
+
+SOURCES   = $(wildcard $(SRC_DIR)/*.c)
+OBJECTS   = $(addprefix $(OBJ_DIR)/, $(SOURCES:.c=.o))
+
+###############################################
 
 $(TARGET): $(OBJECTS)
-	gcc -o $@ $^
+	$(COMPILER) $(CFLAGS) -o $@ $^ $(LINKS)
 
 $(OBJ_DIR)/%.o: %.c
-	#@[ -d $(OBJ_DIR) ]
 	@mkdir -p $(dir $@)
-	gcc -o $@ -c $<
+	$(COMPILER) $(CFLAGS) -o $@ -c $<
 
 all: clean $(TARGET)
 
