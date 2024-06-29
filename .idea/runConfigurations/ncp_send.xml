@@ -1,0 +1,7 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="ncp send" type="CLionExternalRunConfiguration" factoryName="Application" PROGRAM_PARAMS="-s -f test.bin 127.0.0.1 22413" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="true" PASS_PARENT_ENVS_2="true" PROJECT_NAME="nonsecure-copy" TARGET_NAME="Make" CONFIG_NAME="Make" RUN_PATH="$PROJECT_DIR$/ncp">
+    <method v="2">
+      <option name="CLION.EXTERNAL.BUILD" enabled="true" />
+    </method>
+  </configuration>
+</component>

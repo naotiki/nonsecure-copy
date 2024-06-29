@@ -4,12 +4,15 @@
 
 #ifndef NONSECURE_COPY_ARGPARSER_H
 #define NONSECURE_COPY_ARGPARSER_H
+
 #include "nwutils.h"
 
 #include <stdlib.h>
 #include <getopt.h>
 #include <netinet/in.h>
 #include <stdio.h>
+#include <unistd.h>
+#include <libgen.h>
 
 #define NCP_MODE_NONE 0
 #define NCP_MODE_SEND 1
@@ -19,7 +22,8 @@
 struct ncp_info {
     int mode;
     struct sockaddr_in addr;
-
+    char *filepath;
+    char *filename;
 };
 
 void parse_args(int argc, char *argv[], struct ncp_info *info);

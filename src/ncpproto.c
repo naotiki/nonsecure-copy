@@ -10,30 +10,39 @@ void send_header(int fd, struct ncp_header header) {
     write(fd, header.from_identifier, header.from_identifier_size);
     write(fd, &(header.filename_size), sizeof(size_t));
     write(fd, header.filename, header.filename_size);
-    write(fd, &(header.content_size), sizeof(unsigned long long));
+    write(fd, &(header.content_size), sizeof(off_t));
 }
 
 #include <stdio.h>
 
 void recv_header(int fd, struct ncp_header *header) {
     read(fd, &(header->from_identifier_size), sizeof(size_t));
-    printf("%zu\n", header->from_identifier_size);
-    char *f= malloc(header->from_identifier_size * sizeof(char ));
-    read(fd, f, header->from_identifier_size);
-    printf("%s\n", f);
-    free(f);
+    header->from_identifier = malloc(header->from_identifier_size * sizeof(char));
+    read(fd, header->from_identifier, header->from_identifier_size);
     read(fd, &(header->filename_size), sizeof(size_t));
-    printf("%zu\n", header->filename_size);
+    header->filename = malloc(header->filename_size * sizeof(char));
     read(fd, header->filename, header->filename_size);
-    read(fd, &(header->content_size), sizeof(unsigned long long));
-    printf("%llu\n", header->content_size);
+    read(fd, &(header->content_size), sizeof(off_t));
 }
 
-struct ncp_header create_header(char *from_id, char *filename, unsigned long long int content_size) {
+struct ncp_header create_header(char *filename, off_t content_size) {
+
+    char *user_name = getpwuid(getuid())->pw_name;
+    char *hostname = malloc((255 + 1) * sizeof(char));
+    gethostname(hostname, (255 + 1) * sizeof(char));
+    printf("%s\n", hostname);
+    size_t len = (strlen(user_name) + 1 + strlen(hostname) + 1) * sizeof(char);
+    char *from_id = malloc(len);
+    memset(from_id, 0, len);
+    strcat(from_id, user_name);
+    strcat(from_id, "@");
+    strcat(from_id, hostname);
+    free(hostname);
+
     struct ncp_header result = {
-            strlen(from_id),
+            strlen(from_id) + 1,
             from_id,
-            strlen(filename),
+            strlen(filename) + 1,
             filename,
             content_size
     };
