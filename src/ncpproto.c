@@ -13,8 +13,6 @@ void send_header(int fd, struct ncp_header header) {
     write(fd, &(header.content_size), sizeof(off_t));
 }
 
-#include <stdio.h>
-
 void recv_header(int fd, struct ncp_header *header) {
     read(fd, &(header->from_identifier_size), sizeof(size_t));
     header->from_identifier = malloc(header->from_identifier_size * sizeof(char));
@@ -26,14 +24,12 @@ void recv_header(int fd, struct ncp_header *header) {
 }
 
 struct ncp_header create_header(char *filename, off_t content_size) {
-
     char *user_name = getpwuid(getuid())->pw_name;
     char *hostname = malloc((255 + 1) * sizeof(char));
     gethostname(hostname, (255 + 1) * sizeof(char));
-    printf("%s\n", hostname);
     size_t len = (strlen(user_name) + 1 + strlen(hostname) + 1) * sizeof(char);
     char *from_id = malloc(len);
-    memset(from_id, 0, len);
+    bzero(from_id,len);
     strcat(from_id, user_name);
     strcat(from_id, "@");
     strcat(from_id, hostname);
