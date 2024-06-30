@@ -49,7 +49,7 @@ void parse_args(int argc, char **argv, struct ncp_info *info) {
         }
     }
     if (info->mode == NCP_MODE_NONE) {
-        parse_error("No mode specified");
+        parse_error("No mode specified\n");
     }
     char *hostname = NULL;
     char *port_str = NULL;
@@ -57,7 +57,7 @@ void parse_args(int argc, char **argv, struct ncp_info *info) {
             &hostname, &port_str
     };
     if (argc - optind != sizeof(nonoption_args) / sizeof(nonoption_args[0])) {
-        parse_error("Invalid argument.");
+        parse_error("Invalid argument\n");
     }
     for (int index = optind; index < argc; index++) {
         *(nonoption_args[index - optind]) = argv[index];
