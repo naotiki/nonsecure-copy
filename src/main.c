@@ -34,7 +34,8 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
-#define SIZE 2048
+#define BUF_SIZE 2048
+
 void cmd_receive(struct ncp_info info) {
     puts("MODE: Receive");
     info.addr.sin_family = AF_INET;
@@ -74,18 +75,23 @@ void cmd_receive(struct ncp_info info) {
     int p = ACC;
     write(sock, &p, sizeof(int));
     char *filename = info.filename == NULL ? hout.filename : info.filename;
-    printf("%s\n",filename);
+    printf("%s\n", filename);
     FILE *out = fopen(filename, "w");
     if (!out) {
         perror("fopen");
         exit(1);
     }
 
-    char buf[SIZE];
-    while(recv(sock, buf, SIZE, 0) > 0)
-    {
-        fprintf(out, "%s", buf);
-        bzero(buf, SIZE);
+    char buf[BUF_SIZE];
+    int n;
+    while ((n = recv(sock, buf, BUF_SIZE, 0)) > 0) {
+        char *eof = memchr(buf, EOF, BUF_SIZE);
+        if (eof != NULL) {
+            fwrite(buf, 1, eof - buf, out);
+            break;
+        }
+        fwrite(buf, 1, n, out);
+        bzero(buf, BUF_SIZE);
     }
 
     if (fclose(out) == EOF) {
@@ -95,6 +101,7 @@ void cmd_receive(struct ncp_info info) {
     free_header(hout);
     close(sock);
 }
+
 void cmd_send(struct ncp_info info) {
     puts("MODE: Send");
     FILE *fp = fopen(info.filepath, "r");
@@ -121,16 +128,18 @@ void cmd_send(struct ncp_info info) {
     switch (p) {
         case ACC:
             puts("Sending...");
-            char data[SIZE] = {0};
-            while(fgets(data, SIZE, fp)!=NULL)
-            {
-                if(send(soc, data, sizeof(data), 0)== -1)
-                {
+            char data[BUF_SIZE] = {0};
+            size_t readed;
+            while ((readed = fread(data, sizeof(char), BUF_SIZE, fp)) > 0) {
+                if (write(soc, data, readed) == -1) {
                     perror("[-] Error in sendung data");
                     exit(1);
                 }
-                bzero(data, SIZE);
+                bzero(data, BUF_SIZE);
             }
+            int eof = EOF;
+            write(soc, &eof, sizeof(int));
+
             break;
         case BYE:
             break;
