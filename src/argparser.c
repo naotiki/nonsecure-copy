@@ -48,6 +48,9 @@ void parse_args(int argc, char **argv, struct ncp_info *info) {
                 show_help();
         }
     }
+    if (info->mode == NCP_MODE_NONE) {
+        parse_error("No mode specified");
+    }
     char *hostname = NULL;
     char *port_str = NULL;
     char **nonoption_args[] = {

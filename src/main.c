@@ -27,7 +27,6 @@ int main(int argc, char *argv[]) {
             cmd_send(info);
             break;
         default:
-            fprintf(stderr, "ERR: NO MODE");
             break;
     }
 
@@ -54,13 +53,12 @@ void cmd_receive(struct ncp_info info) {
 
     struct ncp_header hout = {0};
     recv_header(sock, &hout);
-    puts("recv!");
     printf("from     : %s\n", hout.from_identifier);
     printf("filename : %s\n", hout.filename);
     printf("filesize : ");
     print_bytes(hout.content_size);
     printf("\n");
-    printf("RECV? (y/N)");
+    printf("continue? (y/N)");
 
     char c = '\0';
     scanf("%c", &c);
@@ -75,7 +73,7 @@ void cmd_receive(struct ncp_info info) {
     int p = ACC;
     write(sock, &p, sizeof(int));
     char *filename = info.filename == NULL ? hout.filename : info.filename;
-    printf("%s\n", filename);
+    printf("Copying to %s...\n", filename);
     FILE *out = fopen(filename, "w");
     if (!out) {
         perror("fopen");
@@ -83,16 +81,23 @@ void cmd_receive(struct ncp_info info) {
     }
 
     char buf[BUF_SIZE];
-    int n;
-    while ((n = recv(sock, buf, BUF_SIZE, 0)) > 0) {
-        char *eof = memchr(buf, EOF, BUF_SIZE);
-        if (eof != NULL) {
-            fwrite(buf, 1, eof - buf, out);
-            break;
+    ssize_t processed_bytes = 0;
+    while (processed_bytes < hout.content_size ) {
+        ssize_t bytes = recv(sock, buf, BUF_SIZE, 0);
+        //content_sizeの長さにする
+        if (processed_bytes+bytes > hout.content_size) {
+            bytes = hout.content_size - processed_bytes;
         }
-        fwrite(buf, 1, n, out);
+        fwrite(buf, 1, bytes, out);
+        processed_bytes += bytes;
+        printf("\r\033[2K");
+        print_bytes(processed_bytes);
+        printf(" / ");
+        print_bytes(hout.content_size);
+        printf(" (%ld%%)",processed_bytes*100/hout.content_size);
         bzero(buf, BUF_SIZE);
     }
+    printf("\n");
 
     if (fclose(out) == EOF) {
         perror("fclose");
