@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="ncp recv" type="CLionExternalRunConfiguration" factoryName="Application" PROGRAM_PARAMS="-r 127.0.0.1 22413 -n test2.bin" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="true" PASS_PARENT_ENVS_2="true" PROJECT_NAME="nonsecure-copy" TARGET_NAME="Make" CONFIG_NAME="Make" RUN_PATH="$PROJECT_DIR$/ncp">
+  <configuration default="false" name="ncp recv" type="CLionExternalRunConfiguration" factoryName="Application" PROGRAM_PARAMS="-r 127.0.0.1 22413 -R test2.bin" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="true" PASS_PARENT_ENVS_2="true" PROJECT_NAME="nonsecure-copy" TARGET_NAME="Make" CONFIG_NAME="Make" RUN_PATH="$PROJECT_DIR$/ncp">
     <method v="2">
       <option name="CLION.EXTERNAL.BUILD" enabled="true" />
     </method>
