@@ -34,6 +34,7 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
+#define SIZE 2048
 void cmd_receive(struct ncp_info info) {
     puts("MODE: Receive");
     info.addr.sin_family = AF_INET;
@@ -72,18 +73,28 @@ void cmd_receive(struct ncp_info info) {
 
     int p = ACC;
     write(sock, &p, sizeof(int));
+    char *filename = info.filename == NULL ? hout.filename : info.filename;
+    printf("%s\n",filename);
+    FILE *out = fopen(filename, "w");
+    if (!out) {
+        perror("fopen");
+        exit(1);
+    }
 
-    char buf[256];
-    do {
-        memset(buf, 0, 256 * sizeof(char));
-        read(sock, buf, 256);
-        write(1, buf, 256);
-    } while (memchr(buf, EOF, 256) == NULL);
+    char buf[SIZE];
+    while(recv(sock, buf, SIZE, 0) > 0)
+    {
+        fprintf(out, "%s", buf);
+        bzero(buf, SIZE);
+    }
 
+    if (fclose(out) == EOF) {
+        perror("fclose");
+        exit(EXIT_FAILURE);
+    }
     free_header(hout);
     close(sock);
 }
-
 void cmd_send(struct ncp_info info) {
     puts("MODE: Send");
     FILE *fp = fopen(info.filepath, "r");
@@ -110,12 +121,16 @@ void cmd_send(struct ncp_info info) {
     switch (p) {
         case ACC:
             puts("Sending...");
-            int tmp = fgetc(fp);
-            while (tmp != EOF) {
-                write(soc, &tmp, sizeof(int));
-                tmp = fgetc(fp);
+            char data[SIZE] = {0};
+            while(fgets(data, SIZE, fp)!=NULL)
+            {
+                if(send(soc, data, sizeof(data), 0)== -1)
+                {
+                    perror("[-] Error in sendung data");
+                    exit(1);
+                }
+                bzero(data, SIZE);
             }
-            write(soc, &tmp, sizeof(int));
             break;
         case BYE:
             break;
