@@ -14,6 +14,8 @@ BIN       = ncp
 TARGET    = $(BUILD_DIR)/$(BIN)
 ###############################################
 
+all: $(TARGET)
+
 $(TARGET): $(OBJECTS)
 	$(COMPILER) $(CFLAGS) -o $@ $^ $(LINKS)
 
@@ -21,7 +23,9 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	@mkdir -p $(dir $@)
 	$(COMPILER) $(CFLAGS) -o $@ -c $<
 
-all: $(TARGET)
+
+release: CFLAGS = -Wall -O2
+release: all
 
 clean:
 	rm -f $(OBJECTS) $(TARGET)
