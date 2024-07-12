@@ -29,6 +29,3 @@ release: all
 
 clean:
 	rm -f $(OBJECTS) $(TARGET)
-
-
-
